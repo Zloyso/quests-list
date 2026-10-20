@@ -1,9 +1,9 @@
 {
 	"id": "quests-list",
 	"name": "Quests List",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "1.8.7",
-	"description": "To-do lists with nested and private lists, start and due dates, attachments and note links, a calendar, and sync with Google, Yandex and CalDAV calendars.",
+	"description": "Manage to-do lists with nested and private lists, start and due dates, attachments, note links, a calendar, and sync with Google, Yandex and CalDAV calendars.",
 	"author": "Zloyso",
 	"authorUrl": "https://github.com/Zloyso",
 	"isDesktopOnly": false

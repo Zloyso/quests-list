@@ -1,7 +1,7 @@
 {
 	"name": "quests-list",
-	"version": "1.0.0",
-	"description": "To-do lists with nested and private lists, start and due dates, attachments and note links, a calendar, and sync with Google, Yandex and CalDAV calendars.",
+	"version": "1.0.1",
+	"description": "Manage to-do lists with nested and private lists, start and due dates, attachments, note links, a calendar, and sync with Google, Yandex and CalDAV calendars.",
 	"main": "main.js",
 	"type": "module",
 	"private": true,

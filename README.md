@@ -1,5 +1,7 @@
 # Quests List
 
+To-do lists for Obsidian with nested and password-protected lists, start and due dates, attachments, a calendar page, and sync with Google, Yandex and CalDAV calendars. Works on desktop and mobile. [English description below](#english).
+
 Простые списки задач для Obsidian с календарём и синхронизацией с Яндекс, Google и другими календарями. Работает на компьютере, телефоне и планшете.
 
 ## Возможности
@@ -105,6 +107,12 @@ Google не разрешает сторонним плагинам общий к
 
 Логины, пароли приложений и токен Google хранятся в настройках плагина (`.obsidian/plugins/quests-list/data.json`) и никуда больше не передаются. Задачи закрытых списков во внешние календари не отправляются. Без подключённых календарей плагин в сеть не выходит. Телеметрии и рекламы нет.
 
+Для синхронизации нужен аккаунт в соответствующем календаре (Google, Яндекс, iCloud и т. п.), а для Google — ещё и собственный OAuth-клиент (см. выше). Всё остальное работает без аккаунтов и без интернета.
+
+## Лицензия
+
+[MIT](LICENSE). В сборку входит библиотека [ical.js](https://github.com/kewisch/ical.js) (Mozilla Public License 2.0) для чтения календарей в формате iCalendar.
+
 ## Установка
 
 ### Через BRAT
@@ -137,7 +145,11 @@ Quests List is a simple to-do plugin for Obsidian on desktop and mobile. Three p
 
 **Calendar sync**: Yandex Calendar and other CalDAV servers (iCloud, Nextcloud, Fastmail), Google Calendar (with your own OAuth "Desktop app" client, see the steps above), and read-only `.ics` subscriptions. Tasks can be sent to CalDAV and Google calendars as events; moving or renaming such an event in the calendar updates the task.
 
-**Network use**: the plugin connects only to the calendars you add (your `.ics` links, your CalDAV server, or Google's OAuth and Calendar API; Google sign-in briefly listens on `127.0.0.1` on desktop). Credentials stay in the plugin's settings. Without connected calendars it makes no network requests. No telemetry.
+**Network use**: the plugin connects only to the calendars you add (your `.ics` links, your CalDAV server, or Google's OAuth and Calendar API; Google sign-in briefly listens on `127.0.0.1` on desktop). Credentials stay in the plugin's settings. Without connected calendars it makes no network requests. No telemetry, no ads.
+
+**Accounts**: calendar sync needs an account with that calendar service (Google, Yandex, iCloud…), and Google also needs your own OAuth client. Everything else works without any account and offline.
+
+**License**: MIT. Bundles [ical.js](https://github.com/kewisch/ical.js) (Mozilla Public License 2.0) to read iCalendar data.
 
 **Data** lives in the `Quests` folder of your vault (`quests.json` and `attachments/`; the folder can be moved in the settings or in the file explorer) and is merged per task when synced between devices.
 
