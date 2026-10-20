@@ -31,8 +31,8 @@ export interface Task {
 	title: string;
 	/** Markdown; [[links]] work like in notes. */
 	notes: string;
-	/** "YYYY-MM-DD" or "YYYY-MM-DDTHH:mm", local time. */
-	start: string;
+	/** "YYYY-MM-DD" or "YYYY-MM-DDTHH:mm", local time; null = no start date. Both dates are optional. */
+	start: string | null;
 	end: string | null;
 	done: boolean;
 	doneAt: number | null;
@@ -111,7 +111,7 @@ export function createTask(fields: Partial<Task> & { listId: string; title: stri
 	return {
 		id: newId(),
 		notes: '',
-		start: todayStr(),
+		start: null,
 		end: null,
 		done: false,
 		doneAt: null,
@@ -199,9 +199,10 @@ export function sortTasks(tasks: Task[], sort: TaskSort, listOrder?: Map<string,
 		a.createdAt - b.createdAt;
 	const compare: Record<TaskSort, (a: Task, b: Task) => number> = {
 		manual,
-		start: (a, b) => a.start.localeCompare(b.start) || manual(a, b),
-		// Tasks without an end date go last.
-		end: (a, b) => (a.end ?? '9999').localeCompare(b.end ?? '9999') || a.start.localeCompare(b.start) || manual(a, b),
+		// Tasks without the date go last.
+		start: (a, b) => (a.start ?? '9999').localeCompare(b.start ?? '9999') || manual(a, b),
+		end: (a, b) =>
+			(a.end ?? '9999').localeCompare(b.end ?? '9999') || (a.start ?? '9999').localeCompare(b.start ?? '9999') || manual(a, b),
 		title: (a, b) => c.compare(a.title, b.title) || manual(a, b),
 		created: (a, b) => b.createdAt - a.createdAt,
 	};
@@ -212,27 +213,41 @@ export function sameFilter(a: TaskFilter, b: TaskFilter): boolean {
 	return a.kind === b.kind && (a.kind !== 'list' || (b.kind === 'list' && a.id === b.id));
 }
 
-/** Last day the task is active ("YYYY-MM-DD"). */
-export function lastDay(task: Task): string {
-	const start = datePart(task.start);
-	const end = task.end ? datePart(task.end) : start;
-	return end < start ? start : end;
+export function hasDates(task: Pick<Task, 'start' | 'end'>): boolean {
+	return task.start !== null || task.end !== null;
+}
+
+/** First day the task is active ("YYYY-MM-DD"): its start, or its due date when there is no start. Null without dates. */
+export function firstDay(task: Pick<Task, 'start' | 'end'>): string | null {
+	const value = task.start ?? task.end;
+	return value ? datePart(value) : null;
+}
+
+/** Last day the task is active ("YYYY-MM-DD"). Null without dates. */
+export function lastDay(task: Pick<Task, 'start' | 'end'>): string | null {
+	const first = firstDay(task);
+	if (!first) {
+		return null;
+	}
+	const end = task.end ? datePart(task.end) : first;
+	return end < first ? first : end;
 }
 
 export function isOverdue(task: Task, today = todayStr()): boolean {
 	return !task.done && task.end !== null && datePart(task.end) < today;
 }
 
-/** Open tasks that have started by today, including overdue ones. */
+/** Open tasks that have started (or are due) by today, including overdue ones. Tasks without dates are not here. */
 export function isForToday(task: Task, today = todayStr()): boolean {
-	return !task.done && datePart(task.start) <= today;
+	const first = firstDay(task);
+	return !task.done && first !== null && first <= today;
 }
 
 export const UPCOMING_DAYS = 7;
 
 export function isUpcoming(task: Task, today = todayStr()): boolean {
-	const start = datePart(task.start);
-	return !task.done && start > today && start <= addDays(today, UPCOMING_DAYS);
+	const first = firstDay(task);
+	return !task.done && first !== null && first > today && first <= addDays(today, UPCOMING_DAYS);
 }
 
 export function matchesFilter(task: Task, filter: TaskFilter, today = todayStr()): boolean {
@@ -258,7 +273,9 @@ export function matchesQuery(task: Task, query: string): boolean {
 
 /** True when the task covers `date` ("YYYY-MM-DD"). */
 export function coversDate(task: Task, date: string): boolean {
-	return datePart(task.start) <= date && date <= lastDay(task);
+	const first = firstDay(task);
+	const last = lastDay(task);
+	return first !== null && last !== null && first <= date && date <= last;
 }
 
 export function removeTask(data: QuestsData, id: string): void {
@@ -536,7 +553,7 @@ function parseTask(raw: unknown): Task | null {
 		listId: o.listId,
 		title: str(o.title),
 		notes: str(o.notes),
-		start: isValidDateValue(o.start) ? o.start : todayStr(new Date(createdAt || Date.now())),
+		start: isValidDateValue(o.start) ? o.start : null,
 		end: isValidDateValue(o.end) ? o.end : null,
 		done: o.done === true,
 		doneAt: typeof o.doneAt === 'number' ? o.doneAt : null,

@@ -17,7 +17,11 @@ type ICalComponent = InstanceType<typeof ICAL.Component>;
 
 // ---------- Tasks <-> event timing ----------
 
-export function taskEventTime(task: Pick<Task, 'start' | 'end'>): EventTime {
+/** Event timing for a task; a task with only a due date becomes an event on that date. Null without dates. */
+export function taskEventTime(task: Pick<Task, 'start' | 'end'>): EventTime | null {
+	if (task.start === null) {
+		return task.end ? taskEventTime({ start: task.end, end: null }) : null;
+	}
 	const startDate = datePart(task.start);
 	if (!timePart(task.start)) {
 		const endDate = task.end && datePart(task.end) > startDate ? datePart(task.end) : startDate;
@@ -34,13 +38,17 @@ export function taskEventTime(task: Pick<Task, 'start' | 'end'>): EventTime {
 	return { allDay: false, start, end };
 }
 
-export function taskToPayload(task: Task, untitled: string): EventPayload {
-	return {
-		taskId: task.id,
-		title: (task.done ? DONE_PREFIX : '') + (task.title.trim() || untitled),
-		description: task.notes,
-		time: taskEventTime(task),
-	};
+/** The task as an event, or null for a task without dates (it stays out of calendars). */
+export function taskToPayload(task: Task, untitled: string): EventPayload | null {
+	const time = taskEventTime(task);
+	return time
+		? {
+				taskId: task.id,
+				title: (task.done ? DONE_PREFIX : '') + (task.title.trim() || untitled),
+				description: task.notes,
+				time,
+			}
+		: null;
 }
 
 /** Task start/end for event timing (the reverse of taskEventTime). */

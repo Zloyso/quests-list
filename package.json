@@ -1,6 +1,6 @@
 {
 	"name": "quests-list",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"description": "Manage to-do lists with nested and private lists, start and due dates, attachments, note links, a calendar, and sync with Google, Yandex and CalDAV calendars.",
 	"main": "main.js",
 	"type": "module",

@@ -200,7 +200,7 @@ describe('task <-> event timing', () => {
 			{ start: '2026-10-20', end: '2026-10-25' },
 			{ start: '2026-10-20T10:00', end: '2026-10-21T12:30' },
 		]) {
-			expect(taskDatesFromTime(taskEventTime(task))).toEqual(task);
+			expect(taskDatesFromTime(taskEventTime(task)!)).toEqual(task);
 		}
 	});
 });
@@ -220,7 +220,7 @@ describe('iCalendar', () => {
 
 	it('writes task events that read back the same', () => {
 		const task = createTask({ listId: 'l', title: 'Купить, молоко; хлеб', notes: 'line 1\nline 2', start: '2026-10-20T10:00', end: '2026-10-20T11:30' });
-		const payload = taskToPayload(task, 'Untitled');
+		const payload = taskToPayload(task, 'Untitled')!;
 		const ics = buildIcs(payload);
 		expect(ics).toContain('SUMMARY:Купить\\, молоко\\; хлеб');
 		const parsed = parseIcs(ics, 'acc', from, to, { href: 'h' });

@@ -10,7 +10,7 @@ To-do lists for Obsidian with nested and password-protected lists, start and due
 - **Умные списки**: «Сегодня» (начатые и просроченные), «Ближайшие 7 дней», «Все задачи». Там же — переход в календарь.
 - **Цвет и иконка у списка**: иконки из того же набора, что в самом Obsidian (меню списка → «Иконка…»).
 - **Вложенные списки**: меню списка → «Новый подсписок». Открытый список показывает свои задачи и задачи вложенных списков, сгруппированные по подзаголовкам. Список можно перетащить внутрь другого (на середину строки), рядом с другим (на верхний или нижний край) или на заголовок «Списки», чтобы вынести на верхний уровень. То же — через меню «Переместить в…».
-- **Даты**: у задачи есть дата начала (обязательно) и дата окончания (по желанию), обе — с временем или на весь день. Просроченные задачи подсвечиваются.
+- **Даты по желанию**: новая задача создаётся без дат. Можно указать дату начала, срок или обе — с временем или на весь день. Задача только со сроком попадает в «Сегодня» и в календарь в день срока; задача без дат живёт только в своём списке. Задачи, добавленные в «Сегодня» или «Ближайшие 7 дней», получают сегодняшнюю или завтрашнюю дату, чтобы не пропасть из виду. Просроченные задачи подсвечиваются.
 - **Описание в Markdown** с работающими `[[ссылками]]` на заметки.
 - **Ссылки на заметки** хранилища и **вложения**: файл можно выбрать в хранилище или загрузить с устройства. При переименовании файла ссылки обновляются.
 - **Перетаскивание**: меняйте порядок списков и задач, переносите задачу в другой список, бросив её на список слева. Работает мышью и пальцем (за значок ⋮⋮).
@@ -139,7 +139,7 @@ npm run build   # проверка типов и сборка
 
 ## English
 
-Quests List is a simple to-do plugin for Obsidian on desktop and mobile. Three panes show lists, the tasks of the selected list and the task card. Tasks have a start date and an optional due date (with or without time), a Markdown description with working `[[links]]`, linked notes and attachments. Lists can be nested and have their own color and icon. Lists and tasks can be reordered by drag and drop (mouse or touch) or sorted. A separate calendar page shows tasks and events from connected calendars, with per-list filters; drag a task to another day to reschedule it.
+Quests List is a simple to-do plugin for Obsidian on desktop and mobile. Three panes show lists, the tasks of the selected list and the task card. Tasks have an optional start date and due date (with or without time; new tasks have none), a Markdown description with working `[[links]]`, linked notes and attachments. Lists can be nested and have their own color and icon. Lists and tasks can be reordered by drag and drop (mouse or touch) or sorted. A separate calendar page shows tasks and events from connected calendars, with per-list filters; drag a task to another day to reschedule it.
 
 **Private lists**: protect lists with a password. Their tasks and nested lists are stored encrypted (AES-256-GCM, key derived with PBKDF2-SHA256, 600,000 iterations), close automatically after inactivity and are never sent to outside calendars. A forgotten password cannot be recovered.
 

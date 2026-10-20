@@ -216,7 +216,7 @@ export class TasksView extends ItemView {
 		if (!listId) {
 			return;
 		}
-		const start = date ?? (this.filter.kind === 'upcoming' ? addDays(todayStr(), 1) : todayStr());
+		const start = date ?? this.defaultStart();
 		const id = await this.plugin.createTask({ listId, title: '', start });
 		if (!id) {
 			return;
@@ -985,7 +985,7 @@ export class TasksView extends ItemView {
 		if (!listId) {
 			return;
 		}
-		const start = this.filter.kind === 'upcoming' ? addDays(todayStr(), 1) : todayStr();
+		const start = this.defaultStart();
 		await this.plugin.createTask({ listId, title, start });
 	}
 
@@ -1031,10 +1031,13 @@ export class TasksView extends ItemView {
 		const text = row.createDiv({ cls: 'quests-task-text' });
 		text.createDiv({ cls: 'quests-task-title', text: task.title || t('untitled') }).toggleClass('is-untitled', !task.title);
 		const meta = text.createDiv({ cls: 'quests-task-meta' });
-		const dates = meta.createSpan({ cls: 'quests-task-dates' });
-		dates.toggleClass('is-overdue', isOverdue(task));
-		setIcon(dates.createSpan({ cls: 'quests-meta-icon' }), 'calendar');
-		dates.createSpan({ text: this.datesText(task) });
+		const datesText = this.datesText(task);
+		if (datesText) {
+			const dates = meta.createSpan({ cls: 'quests-task-dates' });
+			dates.toggleClass('is-overdue', isOverdue(task));
+			setIcon(dates.createSpan({ cls: 'quests-meta-icon' }), task.start ? 'calendar' : 'flag');
+			dates.createSpan({ text: datesText });
+		}
 		if (this.filter.kind !== 'list') {
 			const list = this.plugin.store.data.lists.find((l) => l.id === task.listId);
 			if (list) {
@@ -1065,7 +1068,11 @@ export class TasksView extends ItemView {
 		makeDraggable(row, handle, () => this.taskDragOptions(task));
 	}
 
-	private datesText(task: Task): string {
+	/** Null for a task without dates. */
+	private datesText(task: Task): string | null {
+		if (!task.start) {
+			return task.end ? t('dueOn', { date: formatDateValue(task.end) }) : null;
+		}
 		const start = formatDateValue(task.start);
 		if (!task.end) {
 			return start;
@@ -1441,8 +1448,12 @@ export class TasksView extends ItemView {
 		if (which === 'start' && value && !timePart(value)) {
 			field.createSpan({ cls: 'quests-muted quests-small quests-date-hint', text: t('allDayHint') });
 		}
-		if (which === 'end' && value) {
-			iconButton(field, 'x', t('clearEndDate'), () => this.saveTask(task.id, (target) => (target.end = null)));
+		if (value) {
+			iconButton(field, 'x', which === 'start' ? t('clearStartDate') : t('clearEndDate'), () =>
+				this.saveTask(task.id, (target) => {
+					target[which] = null;
+				}),
+			);
 		} else {
 			// Keeps both date rows the same width on phones, where the clear button would otherwise shift one.
 			field.createSpan({ cls: 'quests-date-spacer' });
@@ -1457,39 +1468,53 @@ export class TasksView extends ItemView {
 				// Still typing the year.
 				return;
 			}
-			if (which === 'start' && !date) {
-				// The start date is required.
+			// Both dates are optional: an emptied field removes the date.
+			const next = date ? withTime(date, time) : null;
+			const current = this.currentTask(task.id) ?? task;
+			if (which === 'start' && next && !current.start && current.end && datePart(current.end) < datePart(next)) {
+				// A new start after the existing due date.
+				new Notice(t('endBeforeStart'));
 				return;
 			}
-			const next = date ? withTime(date, time) : null;
+			if (which === 'end' && next && current.start && datePart(next) < datePart(current.start)) {
+				new Notice(t('endBeforeStart'));
+				return;
+			}
 			this.saveTask(
 				task.id,
 				(target) => {
-					if (which === 'start' && next) {
-						if (target.end && datePart(target.end) < datePart(next)) {
+					if (which === 'start') {
+						if (next && target.start && target.end && datePart(target.end) < datePart(next)) {
 							// Moving the start past the end moves the end too, keeping the length.
 							target.end = shiftDays(target.end, daysBetween(datePart(target.start), datePart(next)));
 						}
 						target.start = next;
-					} else if (which === 'end') {
-						target.end = next && datePart(next) < datePart(target.start) ? target.end : next;
+					} else {
+						target.end = next;
 					}
 				},
 				which,
 			);
-			if (which === 'end' && next && datePart(next) < datePart(this.currentTask(task.id)?.start ?? next)) {
-				new Notice(t('endBeforeStart'));
-			}
 		};
 		dateInput.addEventListener('change', commit);
 		timeInput.addEventListener('change', commit);
-		dateInput.addEventListener('blur', () => {
-			this.flushSaves();
-			if (which === 'start' && !dateInput.value) {
-				dateInput.value = datePart(this.currentTask(task.id)?.start ?? task.start);
-			}
-		});
+		dateInput.addEventListener('blur', () => this.flushSaves());
 		timeInput.addEventListener('blur', () => this.flushSaves());
+	}
+
+	/**
+	 * Start date for a new task: none, except in "Today" and "Next 7 days",
+	 * where a task without a date would not be shown.
+	 */
+	private defaultStart(): string | null {
+		switch (this.filter.kind) {
+			case 'today':
+				return todayStr();
+			case 'upcoming':
+				return addDays(todayStr(), 1);
+			default:
+				return null;
+		}
 	}
 
 	private currentTask(id: string): Task | undefined {

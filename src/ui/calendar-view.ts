@@ -16,7 +16,7 @@ import {
 } from '../dates';
 import { t } from '../i18n';
 import type QuestsPlugin from '../main';
-import { descendantIds, lastDay, listIcon, type ListColor, listPath, listTree, type Task } from '../model';
+import { descendantIds, firstDay, lastDay, listIcon, type ListColor, listPath, listTree, type Task } from '../model';
 import type { CalendarEvent } from '../sync/types';
 import { type DragOptions, makeDraggable } from './drag';
 import { EventModal, eventTimeText, ListPicker, promptText } from './modals';
@@ -334,10 +334,12 @@ export class CalendarView extends ItemView {
 			if ((task.done && !this.showDone) || this.hidden.has(task.listId)) {
 				continue;
 			}
-			const from = datePart(task.start);
+			// Tasks without dates are not on the calendar; one with only a due date is shown on that day.
+			const from = firstDay(task);
 			const to = lastDay(task);
-			if (covers(from, to)) {
-				addCovering(from, to, { kind: 'task', task, sortKey: sortKeyFor(!timePart(task.start), task.start, 'task', task.title) });
+			const anchor = task.start ?? task.end;
+			if (from && to && anchor && covers(from, to)) {
+				addCovering(from, to, { kind: 'task', task, sortKey: sortKeyFor(!timePart(anchor), anchor, 'task', task.title) });
 			}
 		}
 		for (const event of this.plugin.sync.events()) {
@@ -423,14 +425,16 @@ export class CalendarView extends ItemView {
 		setColor(chip, this.colorOf(item));
 		if (item.kind === 'task') {
 			const { task } = item;
+			const anchor = task.start ?? task.end ?? date;
 			chip.toggleClass('is-done', task.done);
-			chip.toggleClass('is-continued', datePart(task.start) < date);
+			chip.toggleClass('is-continued', (firstDay(task) ?? date) < date);
 			if (task.done) {
 				setIcon(chip.createSpan({ cls: 'quests-chip-icon' }), 'check');
+			} else if (!task.start) {
+				setIcon(chip.createSpan({ cls: 'quests-chip-icon' }), 'flag');
 			}
-			const time = timePart(task.start);
-			if (time && datePart(task.start) === date) {
-				chip.createSpan({ cls: 'quests-chip-time', text: formatTime(task.start) });
+			if (timePart(anchor) && datePart(anchor) === date) {
+				chip.createSpan({ cls: 'quests-chip-time', text: formatTime(anchor) });
 			}
 			chip.createSpan({ cls: 'quests-chip-title', text: task.title || t('untitled') });
 			setTooltip(chip, task.title || t('untitled'));
@@ -473,7 +477,7 @@ export class CalendarView extends ItemView {
 		await this.plugin.updateData((data) => {
 			const task = data.tasks.find((item) => item.id === id);
 			if (task) {
-				task.start = shiftDays(task.start, days);
+				task.start = task.start ? shiftDays(task.start, days) : null;
 				task.end = task.end ? shiftDays(task.end, days) : null;
 				task.updatedAt = Date.now();
 			}
@@ -533,8 +537,12 @@ export class CalendarView extends ItemView {
 	}
 
 	private taskTimeText(task: Task): string {
+		if (!task.start) {
+			// Only a due date.
+			return task.end && timePart(task.end) ? t('dueTime', { time: formatTime(task.end) }) : t('dueDay');
+		}
 		const start = datePart(task.start);
-		const end = lastDay(task);
+		const end = lastDay(task) ?? start;
 		if (start !== end) {
 			return t('dayOfSpan', { day: daysBetween(start, this.selected) + 1, total: daysBetween(start, end) + 1 });
 		}

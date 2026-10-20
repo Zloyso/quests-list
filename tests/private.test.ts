@@ -27,9 +27,9 @@ async function setup() {
 	await store.update((d) => {
 		d.lists.push(work, health, nested);
 		d.tasks.push(
-			createTask({ listId: work.id, title: 'Public task' }),
-			createTask({ listId: health.id, title: 'Secret diagnosis' }),
-			createTask({ listId: nested.id, title: 'Call Dr. House' }),
+			createTask({ listId: work.id, title: 'Public task', start: todayStr() }),
+			createTask({ listId: health.id, title: 'Secret diagnosis', start: todayStr() }),
+			createTask({ listId: nested.id, title: 'Call Dr. House', start: todayStr() }),
 		);
 	});
 	await store.setPassword('correct horse');

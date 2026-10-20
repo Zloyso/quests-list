@@ -5,7 +5,7 @@
  *   in the calendar (and the task was not changed here since), the task takes over the new dates and title.
  */
 import { addMonths, parseLocal, startOfMonth, todayStr } from '../dates';
-import { privateScope, type QuestsData, type Task } from '../model';
+import { hasDates, privateScope, type QuestsData, type Task } from '../model';
 import type { QuestsSettings, SyncRecord } from '../settings';
 import { CaldavProvider } from './caldav';
 import { GoogleProvider } from './google';
@@ -49,7 +49,7 @@ export interface SyncReport {
 
 interface TaskUpdate {
 	id: string;
-	start: string;
+	start: string | null;
 	end: string | null;
 	title: string;
 	done: boolean;
@@ -132,9 +132,11 @@ export class SyncEngine {
 			const data = this.host.getData();
 			// Tasks of private lists never leave the vault.
 			const hidden = privateScope(data.lists);
+			// Tasks without dates have no place in a calendar.
 			const eligible = account.push
 				? data.tasks.filter(
-						(task) => !hidden.has(task.listId) && (account.listIds === null || account.listIds.includes(task.listId)),
+						(task) =>
+							hasDates(task) && !hidden.has(task.listId) && (account.listIds === null || account.listIds.includes(task.listId)),
 					)
 				: [];
 			const eligibleIds = new Set(eligible.map((task) => task.id));
@@ -143,6 +145,9 @@ export class SyncEngine {
 
 			for (const task of eligible) {
 				const payload = taskToPayload(task, untitled);
+				if (!payload) {
+					continue;
+				}
 				const hash = payloadHash(payload);
 				const key = eventKey(payload.title, payload.time);
 				const prev: SyncRecord | undefined = state[task.id];
@@ -151,7 +156,11 @@ export class SyncEngine {
 
 				if (found && foundKey !== null && prev && foundKey !== prev.key && hash === prev.hash) {
 					// Changed in the calendar only: take the calendar's version.
-					const dates = taskDatesFromTime(found.time);
+					let dates: { start: string | null; end: string | null } = taskDatesFromTime(found.time);
+					if (task.start === null && dates.end === null) {
+						// A task with only a due date keeps that shape.
+						dates = { start: null, end: dates.start };
+					}
 					const named = taskTitleFromEvent(found.title);
 					const update: TaskUpdate = {
 						id: task.id,
@@ -161,7 +170,8 @@ export class SyncEngine {
 					};
 					updates.push(update);
 					const updated: Task = { ...task, ...update };
-					state[task.id] = { hash: payloadHash(taskToPayload(updated, untitled)), key: foundKey, ref: found.ref };
+					const updatedPayload = taskToPayload(updated, untitled);
+					state[task.id] = { hash: updatedPayload ? payloadHash(updatedPayload) : hash, key: foundKey, ref: found.ref };
 					report.pulled++;
 					continue;
 				}

@@ -203,6 +203,19 @@ describe('sync engine (CalDAV)', () => {
 		expect(server.resources.size).toBe(0);
 	});
 
+	it('keeps tasks without dates out of the calendar', async () => {
+		const { data, list, engine } = setup(caldavAccount());
+		const undated = createTask({ listId: list.id, title: 'Someday' });
+		const dated = createTask({ listId: list.id, title: 'Meeting', start: today });
+		data.tasks.push(undated, dated);
+		await engine.syncAll();
+		expect([...server.resources.keys()]).toEqual([`${CAL}quests-list-${dated.id}.ics`]);
+
+		dated.start = null;
+		await engine.syncAll();
+		expect(server.resources.size).toBe(0);
+	});
+
 	it('pushes only chosen lists', async () => {
 		const account = caldavAccount();
 		const { data, list, engine } = setup(account);

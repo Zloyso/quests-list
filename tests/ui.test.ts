@@ -389,6 +389,8 @@ describe('list icons, date pickers and calendar filters', () => {
 		$(view.contentEl, '.quests-nav-header [aria-label="New list"]').click();
 		await answerPrompt('Work');
 		await quickAdd(view, 'Work task');
+		// Tasks added inside a list have no date; the calendar needs one.
+		await plugin.updateData((d) => d.tasks.forEach((task) => (task.start = todayStr())));
 		await plugin.openCalendar();
 		const leaf = (plugin.app.workspace as unknown as { getLeavesOfType(t: string): FakeLeaf[] }).getLeavesOfType(VIEW_TYPE_CALENDAR)[0]!;
 		const calendar = leaf.view as unknown as CalendarView;
@@ -500,6 +502,7 @@ describe('nested lists in the view', () => {
 
 	it('hides a parent list together with its nested lists in the calendar', async () => {
 		const { plugin } = await withLists();
+		await plugin.updateData((d) => d.tasks.forEach((task) => (task.start = todayStr())));
 		await plugin.openCalendar();
 		const leaf = (plugin.app.workspace as unknown as { getLeavesOfType(t: string): FakeLeaf[] }).getLeavesOfType(VIEW_TYPE_CALENDAR)[0]!;
 		const calendar = leaf.view as unknown as CalendarView;
@@ -668,5 +671,69 @@ describe('private lists in the view', () => {
 		expect(plugin.store.locked).toBe(true);
 		expect(notices).toContain('Private lists were closed after inactivity');
 		expect($(view.contentEl, '.quests-pane-tasks .quests-empty').textContent).toContain('private list');
+	});
+});
+
+describe('tasks without dates', () => {
+	it('creates tasks without dates inside a list, and dated ones in "Today"', async () => {
+		const { plugin, view } = await start();
+		await quickAdd(view, 'Dated');
+		expect(plugin.store.data.tasks[0]!.start).toBe(todayStr());
+		$$(view.contentEl, '.quests-nav-item').find((el) => el.textContent?.includes('Inbox'))!.click();
+		await quickAdd(view, 'Someday');
+		const someday = plugin.store.data.tasks.find((t) => t.title === 'Someday')!;
+		expect(someday).toMatchObject({ start: null, end: null });
+		const row = $$(view.contentEl, '.quests-task').find((el) => el.textContent?.includes('Someday'))!;
+		expect(row.querySelector('.quests-task-dates')).toBeNull();
+		// Not in "Today".
+		$$(view.contentEl, '.quests-nav-item').find((el) => el.textContent?.includes('Today'))!.click();
+		expect(taskTitles(view)).toEqual(['Dated']);
+
+		// "New task" in a list opens an empty task.
+		$$(view.contentEl, '.quests-nav-item').find((el) => el.textContent?.includes('Inbox'))!.click();
+		await view.newTask();
+		const created = plugin.store.data.tasks.at(-1)!;
+		expect(created).toMatchObject({ start: null, end: null });
+		const [startDate] = $$(view.contentEl, '.quests-date-row input') as HTMLInputElement[];
+		expect(startDate!.value).toBe('');
+	});
+
+	it('clears and sets dates in the detail pane', async () => {
+		const { plugin, view } = await start();
+		await quickAdd(view, 'Task');
+		$(view.contentEl, '.quests-task').click();
+		$(view.contentEl, '[aria-label="Remove start date"]').click();
+		await settle();
+		expect(plugin.store.data.tasks[0]!.start).toBeNull();
+
+		// Only a due date: shown as "due …", counts for "Today" once due.
+		const end = $$(view.contentEl, '.quests-date-row input[type="date"]')[1] as HTMLInputElement;
+		end.value = todayStr();
+		end.dispatchEvent(new Event('change'));
+		end.dispatchEvent(new Event('blur'));
+		await settle();
+		expect(plugin.store.data.tasks[0]).toMatchObject({ start: null, end: todayStr() });
+		expect($(view.contentEl, '.quests-task-dates').textContent).toContain('due');
+		expect(taskTitles(view)).toEqual(['Task']);
+	});
+
+	it('puts a task with only a due date on the calendar, and none without dates', async () => {
+		const { plugin, view } = await start();
+		await quickAdd(view, 'Deadline');
+		$$(view.contentEl, '.quests-nav-item').find((el) => el.textContent?.includes('Inbox'))!.click();
+		await quickAdd(view, 'Undated');
+		await plugin.updateData((d) => {
+			const task = d.tasks.find((t) => t.title === 'Deadline')!;
+			task.start = null;
+			task.end = addDays(todayStr(), 2);
+		});
+		await plugin.openCalendar();
+		const leaf = (plugin.app.workspace as unknown as { getLeavesOfType(t: string): FakeLeaf[] }).getLeavesOfType(VIEW_TYPE_CALENDAR)[0]!;
+		const calendar = leaf.view as unknown as CalendarView;
+		Object.defineProperty(calendar.contentEl, 'clientWidth', { value: 1200 });
+		calendar.refresh();
+		const chips = $$(calendar.contentEl, '.quests-chip').map((el) => el.closest<HTMLElement>('[data-quests-date]')!.dataset.questsDate);
+		expect(chips).toEqual([addDays(todayStr(), 2)]);
+		expect($(calendar.contentEl, '.quests-chip .quests-chip-icon').dataset.icon).toBe('flag');
 	});
 });
