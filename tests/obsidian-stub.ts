@@ -79,6 +79,11 @@ Object.defineProperty(Node.prototype, 'win', {
 		return (this.ownerDocument ?? document).defaultView ?? window;
 	},
 });
+(globalThis as Record<string, unknown>).createFragment = (callback?: (el: DocumentFragment) => void) => {
+	const fragment = document.createDocumentFragment();
+	callback?.(fragment);
+	return fragment;
+};
 (globalThis as Record<string, unknown>).activeDocument = document;
 (globalThis as Record<string, unknown>).activeWindow = window;
 
@@ -103,7 +108,7 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
 
 // ---------- API ----------
 
-export const Platform = { isDesktopApp: true, isMobile: false, isPhone: false, isIosApp: false, isAndroidApp: false };
+export const Platform = { isDesktop: true, isDesktopApp: true, isMobile: false, isPhone: false, isIosApp: false, isAndroidApp: false };
 
 export function normalizePath(path: string): string {
 	return path.replace(/\\/g, '/').replace(/\/+/g, '/').replace(/^\/|\/$/g, '');

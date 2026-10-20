@@ -95,17 +95,27 @@ Google не разрешает сторонним плагинам общий к
 
 Выберите «Другой CalDAV». Для iCloud адрес сервера — `https://caldav.icloud.com`, пароль — [пароль приложения Apple ID](https://support.apple.com/ru-ru/102654).
 
+## Сеть и приватность
+
+Плагин обращается к сети **только если вы подключили календари**, и только к их серверам:
+
+- подписки `.ics` — по указанной вами ссылке;
+- CalDAV (Яндекс, iCloud и другие) — к указанному серверу, с вашим логином и паролем приложения;
+- Google — к `oauth2.googleapis.com` и `www.googleapis.com` (вход и Calendar API). Для входа на компьютере плагин на время открывает локальный адрес `127.0.0.1` для ответа Google.
+
+Логины, пароли приложений и токен Google хранятся в настройках плагина (`.obsidian/plugins/quests-list/data.json`) и никуда больше не передаются. Задачи закрытых списков во внешние календари не отправляются. Без подключённых календарей плагин в сеть не выходит. Телеметрии и рекламы нет.
+
 ## Установка
 
 ### Через BRAT
 
 1. Установите плагин [BRAT](https://obsidian.md/plugins?id=obsidian42-brat).
-2. В его настройках выберите «Add beta plugin» и укажите адрес репозитория.
+2. В его настройках выберите «Add beta plugin» и укажите `https://github.com/Zloyso/quests-list`.
 3. Включите Quests List в настройках Obsidian.
 
 ### Вручную
 
-Скачайте `main.js`, `manifest.json` и `styles.css` из последнего релиза, положите их в `<хранилище>/.obsidian/plugins/quests-list/` и включите плагин.
+Скачайте `main.js`, `manifest.json` и `styles.css` из [последнего релиза](https://github.com/Zloyso/quests-list/releases/latest), положите их в `<хранилище>/.obsidian/plugins/quests-list/` и включите плагин.
 
 ## Разработка
 
@@ -121,8 +131,14 @@ npm run build   # проверка типов и сборка
 
 ## English
 
-Quests List is a simple to-do plugin for Obsidian on desktop and mobile. Three panes show lists, the tasks of the selected list and the task card. Tasks have a start date and an optional due date (with or without time), a Markdown description with working `[[links]]`, linked notes and attachments. Lists and tasks can be reordered by drag and drop (mouse or touch) or sorted. A separate calendar page shows tasks and events from connected calendars; drag a task to another day to reschedule it.
+Quests List is a simple to-do plugin for Obsidian on desktop and mobile. Three panes show lists, the tasks of the selected list and the task card. Tasks have a start date and an optional due date (with or without time), a Markdown description with working `[[links]]`, linked notes and attachments. Lists can be nested and have their own color and icon. Lists and tasks can be reordered by drag and drop (mouse or touch) or sorted. A separate calendar page shows tasks and events from connected calendars, with per-list filters; drag a task to another day to reschedule it.
 
-Calendar sync: Yandex Calendar and other CalDAV servers (iCloud, Nextcloud, Fastmail), Google Calendar (with your own OAuth "Desktop app" client, see the steps above), and read-only `.ics` subscriptions. Tasks can be sent to CalDAV and Google calendars as events; moving or renaming such an event in the calendar updates the task.
+**Private lists**: protect lists with a password. Their tasks and nested lists are stored encrypted (AES-256-GCM, key derived with PBKDF2-SHA256, 600,000 iterations), close automatically after inactivity and are never sent to outside calendars. A forgotten password cannot be recovered.
 
-Data lives in the `Quests` folder of your vault (`quests.json` and `attachments/`) and is merged per task when synced between devices.
+**Calendar sync**: Yandex Calendar and other CalDAV servers (iCloud, Nextcloud, Fastmail), Google Calendar (with your own OAuth "Desktop app" client, see the steps above), and read-only `.ics` subscriptions. Tasks can be sent to CalDAV and Google calendars as events; moving or renaming such an event in the calendar updates the task.
+
+**Network use**: the plugin connects only to the calendars you add (your `.ics` links, your CalDAV server, or Google's OAuth and Calendar API; Google sign-in briefly listens on `127.0.0.1` on desktop). Credentials stay in the plugin's settings. Without connected calendars it makes no network requests. No telemetry.
+
+**Data** lives in the `Quests` folder of your vault (`quests.json` and `attachments/`; the folder can be moved in the settings or in the file explorer) and is merged per task when synced between devices.
+
+Install with [BRAT](https://obsidian.md/plugins?id=obsidian42-brat) (`https://github.com/Zloyso/quests-list`) or download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/Zloyso/quests-list/releases/latest) into `<vault>/.obsidian/plugins/quests-list/`.

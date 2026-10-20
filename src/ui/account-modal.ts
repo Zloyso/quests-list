@@ -268,8 +268,8 @@ export class AccountModal extends Modal {
 
 		const account = new Setting(this.contentEl)
 			.setName(t('googleAccount'))
-			.setDesc(draft.refreshToken ? t('googleSignedIn') : Platform.isDesktopApp ? t('googleNotSignedIn') : t('googleDesktopOnly'));
-		if (Platform.isDesktopApp) {
+			.setDesc(draft.refreshToken ? t('googleSignedIn') : Platform.isDesktop ? t('googleNotSignedIn') : t('googleDesktopOnly'));
+		if (Platform.isDesktop) {
 			account.addButton((button) =>
 				button
 					.setButtonText(this.signIn ? t('googleWaiting') : draft.refreshToken ? t('googleSignInAgain') : t('googleSignIn'))

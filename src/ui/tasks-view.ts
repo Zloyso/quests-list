@@ -138,8 +138,7 @@ export class TasksView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		// eslint-disable-next-line obsidianmd/ui/sentence-case -- the plugin name
-		return 'Quests List';
+		return this.plugin.manifest.name;
 	}
 
 	getIcon(): string {

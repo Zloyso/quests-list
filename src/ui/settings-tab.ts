@@ -166,7 +166,7 @@ export class QuestsSettingTab extends PluginSettingTab {
 		if (account.type !== 'ics') {
 			details.push(account.push ? t('kindPush') : t('kindReadOnly'));
 		}
-		const desc = activeDocument.createDocumentFragment();
+		const desc = createFragment();
 		desc.appendText(details.join(' · '));
 		desc.createEl('br');
 		if (status?.error) {

@@ -30,6 +30,24 @@ const TASK_EVENT_RE = /^ql([0-9a-f]{20})$/;
 
 export class SignInCancelled extends Error {}
 
+/** The part of Node's http module used for the sign-in redirect (desktop only). */
+interface HttpModule {
+	createServer(): LoopbackServer;
+}
+
+interface LoopbackServer {
+	once(event: 'error', listener: (err: Error) => void): void;
+	listen(port: number, host: string, callback: () => void): void;
+	address(): unknown;
+	on(event: 'request', listener: (req: { url?: string }, res: LoopbackResponse) => void): void;
+	close(): void;
+}
+
+interface LoopbackResponse {
+	writeHead(status: number, headers?: Record<string, string>): void;
+	end(body?: string): void;
+}
+
 const accessTokens = new Map<string, { token: string; expires: number }>();
 
 function randomString(bytes: number): string {
@@ -60,13 +78,16 @@ const DONE_PAGE = `<!doctype html><meta charset="utf-8"><title>Quests List</titl
  * `signal` aborts waiting (e.g. when the dialog is closed).
  */
 export async function googleSignIn(clientId: string, clientSecret: string, signal?: AbortSignal): Promise<string> {
-	if (!Platform.isDesktopApp) {
+	// Node's http module exists only in desktop Obsidian, so it is loaded only there.
+	let http: HttpModule | null = null;
+	if (Platform.isDesktop) {
+		// eslint-disable-next-line @typescript-eslint/no-require-imports, no-undef -- desktop-only module, loaded after the platform check
+		http = require('http') as HttpModule;
+	}
+	if (!http) {
 		throw new SyncError('Google sign-in is available on desktop only');
 	}
-	// Node's http module exists only in desktop Obsidian, so it is loaded here, after the platform check.
-	// eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-nodejs-modules, no-undef
-	const { createServer } = require('http') as typeof import('http');
-	const server = createServer();
+	const server = http.createServer();
 	await new Promise<void>((resolve, reject) => {
 		server.once('error', reject);
 		server.listen(0, '127.0.0.1', () => resolve());
