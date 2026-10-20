@@ -1,0 +1,10 @@
+{
+	"id": "quests-list",
+	"name": "Quests List",
+	"version": "1.0.0",
+	"minAppVersion": "1.8.7",
+	"description": "Simple to-do lists with start and due dates, attachments, note links, a calendar, and sync with Google, Yandex and other calendars.",
+	"author": "Zloyso",
+	"authorUrl": "https://github.com/Zloyso",
+	"isDesktopOnly": false
+}

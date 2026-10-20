@@ -1,0 +1,1625 @@
+/* Quests List */
+
+.quests-view {
+	padding: 0;
+	--quests-gap: var(--size-4-3);
+	--quests-radius: var(--radius-m);
+	--quests-tap: 32px;
+	--quests-color: var(--text-faint);
+}
+
+.is-mobile .quests-view {
+	--quests-tap: 44px;
+}
+
+.quests-muted {
+	color: var(--text-muted);
+}
+
+.quests-small {
+	font-size: var(--font-ui-smaller);
+}
+
+.quests-error-text {
+	color: var(--text-error);
+}
+
+/* The tap size alone sets the size; mobile button padding would make icons uneven and push rows apart. */
+.quests-icon-button,
+.quests-view button.quests-icon-button {
+	box-sizing: border-box;
+	min-width: var(--quests-tap);
+	min-height: var(--quests-tap);
+	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.quests-view .is-hidden {
+	display: none !important;
+}
+
+.quests-color-dot {
+	display: inline-block;
+	flex-shrink: 0;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--quests-color, var(--text-faint));
+}
+
+/* ---------- Forms and modals ---------- */
+
+.quests-form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+}
+
+.quests-form input[type='text'] {
+	width: 100%;
+}
+
+.quests-form-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: var(--size-4-2);
+	margin-top: var(--size-4-2);
+}
+
+.quests-modal-message {
+	margin-top: 0;
+	user-select: text;
+}
+
+.quests-help {
+	margin: 0 0 var(--size-4-2);
+	padding: var(--size-4-2) var(--size-4-3);
+	border-radius: var(--radius-m);
+	background: var(--background-modifier-hover);
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	user-select: text;
+}
+
+.quests-wide-input {
+	width: 260px;
+	max-width: 100%;
+}
+
+.quests-list-checks {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-1);
+	padding: 0 0 var(--size-4-3) var(--size-4-2);
+}
+
+.quests-checkbox {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	cursor: pointer;
+}
+
+.quests-event-details {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-3);
+}
+
+.quests-event-value {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	user-select: text;
+}
+
+.quests-account-setting .setting-item-name {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+}
+
+/* ---------- Layout ---------- */
+
+.quests-manager,
+.quests-calendar {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.quests-toolbar {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-1);
+	padding: var(--size-4-2) var(--size-4-3);
+	border-bottom: 1px solid var(--background-modifier-border);
+	flex-shrink: 0;
+}
+
+.quests-toolbar-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	margin-left: auto;
+}
+
+.quests-search {
+	position: relative;
+	flex: 1;
+	min-width: 0;
+	max-width: 480px;
+}
+
+.quests-search input {
+	width: 100%;
+	padding-left: var(--size-4-8);
+}
+
+.quests-search-icon {
+	position: absolute;
+	left: var(--size-4-2);
+	top: 50%;
+	transform: translateY(-50%);
+	display: flex;
+	color: var(--text-faint);
+	pointer-events: none;
+}
+
+.quests-search-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.quests-sync-button.is-spinning svg {
+	animation: quests-spin 1s linear infinite;
+}
+
+.quests-sync-button.has-error {
+	color: var(--text-error);
+}
+
+@keyframes quests-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.quests-panes {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: minmax(190px, 270px) minmax(240px, 360px) minmax(0, 1fr);
+}
+
+.quests-manager.is-narrow .quests-panes {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+.quests-pane {
+	min-width: 0;
+	min-height: 0;
+	overflow-y: auto;
+}
+
+.quests-pane-lists,
+.quests-pane-tasks {
+	border-right: 1px solid var(--background-modifier-border);
+}
+
+.quests-manager.is-narrow .quests-pane {
+	border-right: none;
+}
+
+.quests-pane-lists {
+	background: var(--background-secondary);
+}
+
+.quests-pane-detail {
+	padding: var(--size-4-4) var(--size-4-6);
+}
+
+.quests-manager.is-narrow .quests-pane-detail {
+	padding: var(--size-4-3) var(--size-4-4);
+}
+
+/* ---------- Lists (left pane) ---------- */
+
+.quests-nav {
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+	padding: var(--size-4-2);
+}
+
+.quests-nav-item {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	min-height: var(--quests-tap);
+	padding: 0 var(--size-4-2);
+	border-radius: var(--radius-s);
+	color: var(--text-normal);
+	cursor: pointer;
+}
+
+.quests-nav-item:hover {
+	background: var(--background-modifier-hover);
+}
+
+.quests-nav-item.is-active {
+	background: var(--background-modifier-active-hover);
+	color: var(--text-accent);
+}
+
+.quests-nav-lists .quests-nav-item {
+	padding-left: 0;
+	gap: var(--size-2-2);
+}
+
+.quests-nav-icon {
+	display: flex;
+	color: var(--text-muted);
+}
+
+.quests-nav-icon.is-colored {
+	color: var(--quests-color);
+}
+
+.quests-nav-item.is-active .quests-nav-icon:not(.is-colored) {
+	color: var(--text-accent);
+}
+
+.quests-nav-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.quests-nav-label {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.quests-nav-count {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+}
+
+.quests-nav-menu {
+	opacity: 0;
+	min-width: 24px;
+	min-height: 24px;
+}
+
+.quests-nav-item:hover .quests-nav-menu,
+.quests-nav-item:focus-within .quests-nav-menu,
+.is-mobile .quests-nav-menu {
+	opacity: 1;
+}
+
+.quests-nav-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: var(--size-4-3) 0 var(--size-4-1);
+	padding: 0 var(--size-4-2);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-semibold);
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.quests-nav-header-actions {
+	display: flex;
+	gap: var(--size-2-1);
+}
+
+.quests-nav-header .quests-icon-button {
+	min-width: 24px;
+	min-height: 24px;
+}
+
+.quests-nav-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--size-4-2);
+	padding: var(--size-4-1) var(--size-4-2);
+	font-size: var(--font-ui-small);
+}
+
+/* ---------- Drag handles and drop targets ---------- */
+
+.quests-handle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 16px;
+	align-self: stretch;
+	color: var(--text-faint);
+	cursor: grab;
+	opacity: 0;
+	touch-action: none;
+}
+
+.quests-handle svg {
+	width: 14px;
+	height: 14px;
+}
+
+.quests-nav-item:hover .quests-handle,
+.quests-task:hover .quests-handle {
+	opacity: 1;
+}
+
+.is-mobile .quests-handle {
+	opacity: 0.7;
+	width: 24px;
+}
+
+.quests-view .is-dragging {
+	opacity: 0.4;
+}
+
+body.quests-is-dragging,
+body.quests-is-dragging * {
+	cursor: grabbing !important;
+	user-select: none !important;
+}
+
+.quests-drag-ghost {
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: var(--layer-dragged-item);
+	transform: translate(calc(var(--quests-x, 0px) + 12px), calc(var(--quests-y, 0px) + 12px));
+	max-width: 260px;
+	padding: var(--size-4-1) var(--size-4-3);
+	border-radius: var(--radius-m);
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	box-shadow: var(--shadow-s);
+	font-size: var(--font-ui-small);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+.quests-drop-before {
+	box-shadow: inset 0 2px 0 var(--interactive-accent);
+}
+
+.quests-drop-after {
+	box-shadow: inset 0 -2px 0 var(--interactive-accent);
+}
+
+.quests-drop-inside {
+	background: hsla(var(--interactive-accent-hsl), 0.15) !important;
+	box-shadow: inset 0 0 0 1px var(--interactive-accent);
+}
+
+/* ---------- Task list (middle pane) ---------- */
+
+.quests-list-header {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding: var(--size-4-2) var(--size-4-3);
+	background: var(--background-primary);
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.quests-list-title {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	flex: 1;
+	min-width: 0;
+	font-weight: var(--font-semibold);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.quests-list-count {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+}
+
+.quests-quick-add {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	margin: var(--size-4-2) var(--size-4-2) 0;
+	padding: 0 var(--size-4-2);
+	border-radius: var(--radius-s);
+	background: var(--background-modifier-hover);
+}
+
+.quests-quick-add-icon {
+	display: flex;
+	color: var(--text-faint);
+}
+
+.quests-quick-add-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.quests-quick-add input,
+.quests-quick-add input:hover,
+.quests-quick-add input:focus {
+	flex: 1;
+	min-width: 0;
+	min-height: var(--quests-tap);
+	padding: 0;
+	border: none;
+	background: transparent;
+	box-shadow: none;
+}
+
+.quests-task-list {
+	padding: var(--size-4-1);
+}
+
+.quests-task {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-3);
+	min-height: calc(var(--quests-tap) + 12px);
+	padding: var(--size-4-1) var(--size-4-2) var(--size-4-1) 0;
+	border-radius: var(--radius-s);
+	cursor: pointer;
+}
+
+.quests-task:hover {
+	background: var(--background-modifier-hover);
+}
+
+.quests-task.is-active {
+	background: var(--background-modifier-active-hover);
+}
+
+.quests-task-text {
+	flex: 1;
+	min-width: 0;
+}
+
+.quests-task-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.quests-task-title.is-untitled {
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+.quests-task.is-done .quests-task-title {
+	color: var(--text-muted);
+	text-decoration: line-through;
+}
+
+.quests-task-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--size-2-1) var(--size-4-2);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.quests-task-dates,
+.quests-task-list-name,
+.quests-meta-count {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	min-width: 0;
+}
+
+.quests-task-dates.is-overdue {
+	color: var(--text-error);
+}
+
+.quests-meta-icon {
+	display: inline-flex;
+	color: var(--text-faint);
+}
+
+.quests-task-dates.is-overdue .quests-meta-icon {
+	color: inherit;
+}
+
+.quests-meta-icon svg {
+	width: 12px;
+	height: 12px;
+}
+
+.quests-done-toggle {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	margin-top: var(--size-4-2);
+	padding: var(--size-4-1) var(--size-4-2);
+	border-radius: var(--radius-s);
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	cursor: pointer;
+}
+
+.quests-done-toggle:hover {
+	background: var(--background-modifier-hover);
+}
+
+.quests-done-chevron {
+	display: flex;
+}
+
+.quests-done-chevron svg {
+	width: 14px;
+	height: 14px;
+}
+
+/* Round "done" checkbox, colored by list. Every size is pinned so no theme or platform style can stretch it. */
+.quests-check {
+	--quests-check-size: 20px;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 var(--quests-check-size);
+	box-sizing: border-box;
+	width: var(--quests-check-size);
+	height: var(--quests-check-size);
+	min-width: var(--quests-check-size);
+	min-height: var(--quests-check-size);
+	max-width: var(--quests-check-size);
+	max-height: var(--quests-check-size);
+	aspect-ratio: 1 / 1;
+	margin: 0;
+	padding: 0;
+	border-radius: 50%;
+	border: 2px solid var(--quests-color, var(--text-faint));
+	background: transparent;
+	color: transparent;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* A larger invisible tap area around the circle. */
+.quests-check::after {
+	content: '';
+	position: absolute;
+	inset: -8px;
+}
+
+.quests-check:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
+
+.quests-check:hover {
+	color: var(--quests-color, var(--text-faint));
+}
+
+.quests-check.is-checked {
+	background: var(--quests-color, var(--interactive-accent));
+	color: var(--background-primary);
+}
+
+.quests-check svg {
+	flex: none;
+	width: 60%;
+	height: 60%;
+	stroke-width: 3px;
+}
+
+.is-mobile .quests-check {
+	--quests-check-size: 24px;
+}
+
+/* ---------- Empty states ---------- */
+
+.quests-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--size-4-3);
+	padding: var(--size-4-8) var(--size-4-4);
+	color: var(--text-muted);
+	text-align: center;
+}
+
+.quests-empty-small {
+	padding: var(--size-4-6) var(--size-4-4);
+}
+
+.quests-detail-empty {
+	min-height: 60%;
+	justify-content: center;
+}
+
+.quests-empty-icon svg {
+	width: 40px;
+	height: 40px;
+	color: var(--text-faint);
+}
+
+/* ---------- Task details (right pane) ---------- */
+
+.quests-detail-header {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--size-4-2);
+	margin-bottom: var(--quests-gap);
+	max-width: 720px;
+}
+
+.quests-detail-header .quests-check {
+	margin-top: 8px;
+}
+
+.quests-title-input,
+.quests-title-input:hover,
+.quests-title-input:focus {
+	flex: 1;
+	min-width: 0;
+	resize: none;
+	overflow: hidden;
+	padding: var(--size-2-2) var(--size-4-1);
+	border: none;
+	background: transparent;
+	box-shadow: none;
+	font-size: var(--h2-size);
+	font-weight: var(--h2-weight, var(--font-semibold));
+	line-height: var(--line-height-tight);
+}
+
+.quests-title-input:focus {
+	background: var(--background-modifier-form-field);
+	border-radius: var(--radius-s);
+}
+
+.quests-title-input.is-done {
+	color: var(--text-muted);
+	text-decoration: line-through;
+}
+
+.quests-detail-actions {
+	display: flex;
+	gap: var(--size-2-1);
+}
+
+.quests-fields {
+	display: grid;
+	grid-template-columns: max-content minmax(0, 1fr);
+	align-items: center;
+	gap: var(--size-4-2) var(--size-4-4);
+	max-width: 720px;
+	margin-bottom: var(--size-4-4);
+}
+
+.quests-field {
+	display: contents;
+}
+
+.quests-field-label,
+.quests-section-header {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+}
+
+.quests-field-icon {
+	display: flex;
+	color: var(--text-faint);
+}
+
+.quests-field-icon svg {
+	width: 14px;
+	height: 14px;
+}
+
+.quests-field-value {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--size-4-2);
+	min-width: 0;
+}
+
+.quests-field-value select {
+	max-width: 100%;
+}
+
+.quests-date-row input[type='date'],
+.quests-date-row input[type='time'] {
+	width: auto;
+}
+
+.quests-date-row input.is-overdue {
+	color: var(--text-error);
+}
+
+.quests-section {
+	max-width: 720px;
+	margin-bottom: var(--size-4-4);
+}
+
+.quests-section-header {
+	margin-bottom: var(--size-4-2);
+}
+
+.quests-section-actions {
+	display: flex;
+	gap: var(--size-2-1);
+	margin-left: auto;
+}
+
+.quests-section-actions .quests-icon-button {
+	min-width: 28px;
+	min-height: 28px;
+}
+
+.quests-notes-preview {
+	min-height: 64px;
+	padding: var(--size-4-2) var(--size-4-3);
+	border-radius: var(--radius-m);
+	border: 1px solid var(--background-modifier-border);
+	cursor: text;
+	user-select: text;
+	overflow-wrap: anywhere;
+}
+
+.quests-notes-preview:hover {
+	border-color: var(--background-modifier-border-hover);
+}
+
+.quests-notes-preview.is-empty {
+	color: var(--text-faint);
+}
+
+.quests-notes-preview > :first-child {
+	margin-top: 0;
+}
+
+.quests-notes-preview > :last-child {
+	margin-bottom: 0;
+}
+
+.quests-notes-input {
+	width: 100%;
+	min-height: 120px;
+	resize: vertical;
+	font-family: var(--font-text);
+	line-height: var(--line-height-normal);
+}
+
+.quests-path-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.quests-path-item {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	min-height: var(--quests-tap);
+	padding: var(--size-2-2) var(--size-4-2);
+	border-radius: var(--radius-s);
+	cursor: pointer;
+}
+
+.quests-path-item:hover {
+	background: var(--background-modifier-hover);
+}
+
+.quests-path-item.is-missing {
+	cursor: default;
+	opacity: 0.6;
+}
+
+.quests-path-icon {
+	display: flex;
+	color: var(--text-muted);
+}
+
+.quests-path-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.quests-thumb {
+	flex-shrink: 0;
+	width: 32px;
+	height: 32px;
+	object-fit: cover;
+	border-radius: var(--radius-s);
+}
+
+.quests-path-text {
+	flex: 1;
+	min-width: 0;
+}
+
+.quests-path-name,
+.quests-path-sub {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.quests-path-sub {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+}
+
+.quests-path-item .quests-icon-button {
+	opacity: 0;
+	min-width: 24px;
+	min-height: 24px;
+}
+
+.quests-path-item:hover .quests-icon-button,
+.quests-path-item:focus-within .quests-icon-button,
+.is-mobile .quests-path-item .quests-icon-button {
+	opacity: 1;
+}
+
+.quests-meta {
+	margin-top: var(--size-4-6);
+	font-size: var(--font-ui-smaller);
+}
+
+/* ---------- Calendar ---------- */
+
+.quests-cal-nav {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-1);
+}
+
+.quests-today-button {
+	font-size: var(--font-ui-small);
+}
+
+.quests-cal-title {
+	margin-left: var(--size-4-2);
+	font-size: var(--font-ui-large);
+	font-weight: var(--font-semibold);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.quests-cal-body {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+}
+
+.quests-calendar.is-narrow .quests-cal-body {
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-rows: auto minmax(0, 1fr);
+}
+
+.quests-cal-month {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	padding: var(--size-4-2);
+}
+
+.quests-cal-weekdays,
+.quests-cal-grid {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.quests-cal-weekday {
+	padding: var(--size-2-2) var(--size-4-2);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.quests-cal-grid {
+	flex: 1;
+	grid-template-rows: repeat(6, minmax(0, 1fr));
+	gap: 1px;
+	min-height: 360px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background: var(--background-modifier-border);
+	overflow: hidden;
+}
+
+.quests-calendar.is-narrow .quests-cal-grid {
+	min-height: 0;
+	grid-template-rows: repeat(6, 48px);
+}
+
+.quests-cal-day {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+	min-height: 0;
+	padding: var(--size-2-2);
+	background: var(--background-primary);
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.quests-cal-day:hover {
+	background: var(--background-primary-alt);
+}
+
+.quests-cal-day.is-weekend {
+	background: var(--background-secondary);
+}
+
+.quests-cal-day.is-other-month .quests-cal-date {
+	color: var(--text-faint);
+}
+
+.quests-cal-day.is-selected {
+	box-shadow: inset 0 0 0 2px var(--interactive-accent);
+}
+
+.quests-cal-date {
+	align-self: flex-start;
+	min-width: 22px;
+	padding: 0 var(--size-2-2);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-small);
+	text-align: center;
+}
+
+.quests-cal-day.is-today .quests-cal-date {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	font-weight: var(--font-semibold);
+}
+
+.quests-calendar.is-narrow .quests-cal-date {
+	align-self: center;
+}
+
+.quests-cal-chips {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-height: 0;
+}
+
+.quests-chip {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	min-width: 0;
+	padding: 1px var(--size-2-2);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-smaller);
+	line-height: 1.4;
+	white-space: nowrap;
+	overflow: hidden;
+	cursor: pointer;
+	border-left: 3px solid var(--quests-color);
+	background: color-mix(in srgb, var(--quests-color) 14%, transparent);
+}
+
+.quests-chip:hover {
+	background: color-mix(in srgb, var(--quests-color) 24%, transparent);
+}
+
+.quests-chip.is-event:not(.is-all-day) {
+	border-left-width: 0;
+	background: transparent;
+}
+
+.quests-chip.is-event:not(.is-all-day)::before {
+	content: '';
+	flex-shrink: 0;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--quests-color);
+}
+
+.quests-chip.is-event:not(.is-all-day):hover {
+	background: var(--background-modifier-hover);
+}
+
+.quests-chip.is-done .quests-chip-title {
+	color: var(--text-muted);
+	text-decoration: line-through;
+}
+
+.quests-chip.is-continued {
+	border-left-style: dotted;
+}
+
+.quests-chip-icon {
+	display: flex;
+	color: var(--quests-color);
+}
+
+.quests-chip-icon svg {
+	width: 10px;
+	height: 10px;
+}
+
+.quests-chip-time {
+	color: var(--text-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.quests-chip-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.quests-cal-more {
+	padding: 0 var(--size-2-2);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.quests-cal-dots {
+	display: flex;
+	justify-content: center;
+	gap: 3px;
+}
+
+.quests-cal-dot {
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: var(--quests-color);
+}
+
+.quests-agenda {
+	min-height: 0;
+	overflow-y: auto;
+	padding: var(--size-4-2) var(--size-4-3);
+	border-left: 1px solid var(--background-modifier-border);
+}
+
+.quests-calendar.is-narrow .quests-agenda {
+	border-left: none;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.quests-agenda-header {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	margin-bottom: var(--size-4-2);
+}
+
+.quests-agenda-title {
+	flex: 1;
+	min-width: 0;
+	font-weight: var(--font-semibold);
+}
+
+.quests-agenda-empty {
+	padding: var(--size-4-2) 0;
+	font-size: var(--font-ui-small);
+}
+
+.quests-agenda-item {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	min-height: var(--quests-tap);
+	padding: var(--size-2-3) var(--size-4-2);
+	border-radius: var(--radius-s);
+	cursor: pointer;
+}
+
+.quests-agenda-item:hover {
+	background: var(--background-modifier-hover);
+}
+
+.quests-agenda-bar {
+	flex-shrink: 0;
+	align-self: stretch;
+	width: 4px;
+	margin: 0 6px;
+	border-radius: 2px;
+	background: var(--quests-color);
+}
+
+.quests-agenda-text {
+	flex: 1;
+	min-width: 0;
+}
+
+.quests-agenda-item-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.quests-agenda-item.is-done .quests-agenda-item-title {
+	color: var(--text-muted);
+	text-decoration: line-through;
+}
+
+.quests-agenda-item-sub {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+/* ---------- "New task" button ---------- */
+
+.quests-toolbar {
+	container: quests-toolbar / inline-size;
+}
+
+.quests-text-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--size-2-3);
+	flex-shrink: 0;
+	box-sizing: border-box;
+	height: var(--quests-tap);
+	min-height: var(--quests-tap);
+	padding: 0 var(--size-4-3) 0 var(--size-4-2);
+	white-space: nowrap;
+	font-size: var(--font-ui-small);
+}
+
+.quests-text-button-icon {
+	display: flex;
+}
+
+.quests-text-button-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+/* On a very narrow toolbar only the icon is left. */
+@container quests-toolbar (max-width: 340px) {
+	.quests-text-button {
+		width: var(--quests-tap);
+		padding: 0;
+	}
+
+	.quests-text-button-label {
+		display: none;
+	}
+}
+
+/* ---------- Calendar link in the lists pane ---------- */
+
+.quests-nav-arrow {
+	display: flex;
+	color: var(--text-faint);
+	opacity: 0;
+}
+
+.quests-nav-arrow svg {
+	width: 14px;
+	height: 14px;
+}
+
+.quests-nav-calendar:hover .quests-nav-arrow,
+.is-mobile .quests-nav-arrow {
+	opacity: 1;
+}
+
+/* ---------- Clickable date rows ---------- */
+
+.quests-field-label.is-clickable,
+.quests-date-row,
+.quests-date-row input {
+	cursor: pointer;
+}
+
+.quests-date-row {
+	margin: calc(-1 * var(--size-2-2));
+	padding: var(--size-2-2);
+	border-radius: var(--radius-s);
+}
+
+.quests-date-row:hover {
+	background: var(--background-modifier-hover);
+}
+
+/* ---------- Calendar filters ---------- */
+
+.quests-cal-filters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--size-2-3);
+	flex-shrink: 0;
+	padding: var(--size-4-2) var(--size-4-3) 0;
+}
+
+.quests-filter-chip {
+	--quests-color: var(--text-muted);
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	box-sizing: border-box;
+	height: 26px;
+	padding: 0 var(--size-4-2);
+	border-radius: 13px;
+	border: 1px solid color-mix(in srgb, var(--quests-color) 45%, transparent);
+	background: color-mix(in srgb, var(--quests-color) 14%, transparent);
+	color: var(--text-normal);
+	font-size: var(--font-ui-smaller);
+	white-space: nowrap;
+	cursor: pointer;
+	user-select: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.quests-filter-chip:hover {
+	background: color-mix(in srgb, var(--quests-color) 24%, transparent);
+}
+
+.quests-filter-chip.is-all {
+	--quests-color: var(--interactive-accent);
+}
+
+.quests-filter-chip.is-off {
+	border-color: var(--background-modifier-border);
+	background: transparent;
+	color: var(--text-faint);
+}
+
+.quests-filter-chip.is-off:hover {
+	background: var(--background-modifier-hover);
+}
+
+.quests-filter-icon {
+	display: flex;
+	color: var(--quests-color);
+}
+
+.quests-filter-chip.is-off .quests-filter-icon {
+	color: var(--text-faint);
+}
+
+.quests-filter-icon svg {
+	width: 14px;
+	height: 14px;
+}
+
+.quests-filter-separator {
+	width: 1px;
+	height: 18px;
+	margin: 0 var(--size-2-2);
+	background: var(--background-modifier-border);
+}
+
+/* ---------- Icon picker ---------- */
+
+.quests-icon-search {
+	width: 100%;
+	margin-bottom: var(--size-4-3);
+}
+
+.quests-icon-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+	gap: var(--size-2-2);
+	max-height: 50vh;
+	overflow-y: auto;
+}
+
+.quests-icon-cell {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: auto;
+	height: 40px;
+	padding: 0;
+	border-radius: var(--radius-s);
+}
+
+.quests-icon-cell.is-active {
+	background: var(--background-modifier-active-hover);
+	color: var(--text-accent);
+}
+
+.quests-icon-cell svg {
+	width: 20px;
+	height: 20px;
+}
+
+.quests-icon-empty {
+	grid-column: 1 / -1;
+	padding: var(--size-4-4);
+	text-align: center;
+}
+
+/* ---------- Mobile and narrow layout ---------- */
+
+.is-mobile .quests-toolbar {
+	padding: var(--size-4-2) var(--size-4-3);
+}
+
+.is-mobile .quests-search {
+	max-width: none;
+}
+
+/* 16px and up keeps iOS from zooming into a field on focus. */
+.is-mobile .quests-view input,
+.is-mobile .quests-view textarea,
+.is-mobile .quests-view select {
+	font-size: 16px;
+}
+
+.is-mobile .quests-view .quests-title-input {
+	font-size: 20px;
+}
+
+/* Room for the last item above the mobile navigation bar. */
+.is-mobile .quests-nav,
+.is-mobile .quests-task-list,
+.is-mobile .quests-agenda,
+.is-mobile .quests-pane-detail {
+	padding-bottom: calc(var(--size-4-12) + env(safe-area-inset-bottom, 0px));
+}
+
+.is-mobile .quests-nav-header .quests-icon-button,
+.is-mobile .quests-section-actions .quests-icon-button {
+	min-width: 36px;
+	min-height: 36px;
+}
+
+.is-mobile .quests-filter-chip {
+	height: 32px;
+	border-radius: 16px;
+	padding: 0 var(--size-4-3);
+}
+
+.quests-manager.is-narrow .quests-toolbar {
+	gap: var(--size-2-3);
+}
+
+.quests-manager.is-narrow .quests-search {
+	max-width: none;
+}
+
+.quests-manager.is-narrow .quests-detail-header {
+	gap: var(--size-4-3);
+	margin-bottom: var(--size-4-2);
+}
+
+.quests-manager.is-narrow .quests-detail-header .quests-check {
+	margin-top: 6px;
+}
+
+/* Fields: label above value. */
+.quests-manager.is-narrow .quests-fields {
+	grid-template-columns: minmax(0, 1fr);
+	gap: 0;
+}
+
+.quests-manager.is-narrow .quests-field-label {
+	margin: var(--size-4-3) 0 var(--size-2-3);
+}
+
+.quests-manager.is-narrow .quests-field-value select {
+	width: 100%;
+}
+
+.quests-manager.is-narrow .quests-date-row {
+	flex-wrap: nowrap;
+	margin: 0;
+	padding: 0;
+}
+
+.quests-manager.is-narrow .quests-date-row input[type='date'] {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+.quests-manager.is-narrow .quests-date-row input[type='time'] {
+	flex: 0 0 auto;
+	width: 6.5em;
+}
+
+.quests-manager.is-narrow .quests-date-hint {
+	display: none;
+}
+
+.quests-manager.is-narrow .quests-section {
+	margin-top: var(--size-4-4);
+}
+
+/* Calendar on a phone: month title on its own row, chips scroll sideways. */
+.quests-calendar.is-narrow .quests-toolbar {
+	flex-wrap: wrap;
+	row-gap: var(--size-2-3);
+}
+
+.quests-calendar.is-narrow .quests-cal-title {
+	order: -1;
+	flex: 1 0 100%;
+	margin-left: 0;
+}
+
+.quests-calendar.is-narrow .quests-cal-filters {
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	padding-bottom: var(--size-2-2);
+	scrollbar-width: none;
+}
+
+.quests-calendar.is-narrow .quests-cal-filters::-webkit-scrollbar {
+	display: none;
+}
+
+.quests-calendar.is-narrow .quests-cal-filters > * {
+	flex-shrink: 0;
+}
+
+.quests-calendar.is-narrow .quests-cal-month {
+	padding: var(--size-4-2) var(--size-4-2) var(--size-2-2);
+}
+
+.quests-calendar.is-narrow .quests-cal-weekday {
+	padding: var(--size-2-2) 0;
+	text-align: center;
+}
+
+.quests-calendar.is-narrow .quests-cal-day {
+	align-items: center;
+	padding: var(--size-2-2) 0;
+}
+
+.quests-date-spacer {
+	display: none;
+}
+
+.quests-manager.is-narrow .quests-date-spacer {
+	display: block;
+	flex: 0 0 var(--quests-tap);
+}
+
+/* Calendar on a phone: "New task" shrinks to an icon so the buttons fit one row. */
+.quests-calendar.is-narrow .quests-text-button {
+	width: var(--quests-tap);
+	padding: 0;
+}
+
+.quests-calendar.is-narrow .quests-text-button-label {
+	display: none;
+}
+
+/* ---------- Nested lists ---------- */
+
+.quests-nav-lists .quests-nav-item {
+	padding-left: calc(var(--quests-depth, 0) * 14px);
+}
+
+.quests-view button.quests-nav-toggle,
+.quests-nav-toggle-spacer {
+	flex: 0 0 20px;
+	width: 20px;
+	min-width: 20px;
+	min-height: 20px;
+	color: var(--text-faint);
+}
+
+.quests-nav-toggle svg {
+	width: 14px;
+	height: 14px;
+}
+
+.is-mobile .quests-view button.quests-nav-toggle,
+.is-mobile .quests-nav-toggle-spacer {
+	flex-basis: 28px;
+	width: 28px;
+	min-width: 28px;
+	min-height: 28px;
+}
+
+/* Tasks of a nested list inside its parent's list. */
+.quests-group-header {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-3);
+	margin: var(--size-4-3) 0 var(--size-2-2);
+	padding: var(--size-2-3) var(--size-4-2);
+	border-radius: var(--radius-s);
+	border-bottom: 1px solid var(--background-modifier-border);
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-semibold);
+	cursor: pointer;
+}
+
+.quests-group-header:hover {
+	background: var(--background-modifier-hover);
+}
+
+.quests-group-icon {
+	display: flex;
+	color: var(--quests-color);
+}
+
+.quests-group-icon svg {
+	width: 14px;
+	height: 14px;
+}
+
+.quests-group-name {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.quests-group-count {
+	font-size: var(--font-ui-smaller);
+	font-weight: normal;
+	color: var(--text-faint);
+}
+
+/* ---------- Private lists ---------- */
+
+.quests-nav-lock {
+	display: flex;
+	color: var(--text-faint);
+}
+
+.quests-nav-lock.is-locked {
+	color: var(--text-muted);
+}
+
+.quests-nav-lock svg {
+	width: 14px;
+	height: 14px;
+}
+
+.quests-label {
+	display: block;
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+	margin-bottom: calc(-1 * var(--size-2-2));
+}
+
+.quests-form input[type='password'] {
+	width: 100%;
+}
+
+.quests-error {
+	min-height: 1.2em;
+	color: var(--text-error);
+	font-size: var(--font-ui-small);
+}
+
+.quests-warning {
+	margin: 0;
+	color: var(--text-warning);
+	font-size: var(--font-ui-small);
+}

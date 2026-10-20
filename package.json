@@ -1,0 +1,30 @@
+{
+	"name": "quests-list",
+	"version": "1.0.0",
+	"description": "Simple to-do lists with start and due dates, attachments, note links, a calendar, and sync with Google, Yandex and other calendars.",
+	"main": "main.js",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc --noEmit && node esbuild.config.mjs production",
+		"lint": "eslint .",
+		"test": "vitest run"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"ical.js": "^2.2.1"
+	},
+	"devDependencies": {
+		"@types/node": "^22.20.5",
+		"esbuild": "^0.25.5",
+		"eslint": "^9.39.5",
+		"eslint-plugin-obsidianmd": "^0.1.9",
+		"globals": "^15.15.0",
+		"jsdom": "^26.1.0",
+		"obsidian": "^1.10.3",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.72.0",
+		"vitest": "^3.2.7"
+	}
+}
